@@ -3,20 +3,21 @@
 // (shading facets, grid lines, sills...) shift by the same ratio, so the low-poly shading survives a colour change.
 // Textures are procedural patterns laid over the component's own shape.
 const LOOK_COMPONENTS = [
-  // key, label, steps it appears in, default fill, kind ('area' = fill + texture, 'line' = fill only)
-  { key: 'paper', label: 'Paper (sheet & ball)', steps: [1, 2, 3, 4], fill: '#f4f3ef', kind: 'area' },
-  { key: 'floor1', label: 'Floor & grid', steps: [1], fill: '#d4d3cf', kind: 'area' },
-  { key: 'wind', label: 'Wind streaks', steps: [1], fill: '#668cff', kind: 'line' },
-  { key: 'stage', label: 'Backdrop', steps: [2, 3], fill: '#e4e3df', kind: 'area' },
-  { key: 'gloves', label: 'Gloves', steps: [2, 3], fill: '#e6e5e0', kind: 'area' },
-  { key: 'chevrons', label: 'Drag chevrons', steps: [2], fill: '#3a3834', kind: 'line' },
-  { key: 'wall', label: 'Wall', steps: [4], fill: '#d6d5d1', kind: 'area' },
-  { key: 'floor', label: 'Floor', steps: [4], fill: '#c4c3be', kind: 'area' },
-  { key: 'window', label: 'Window', steps: [4], fill: '#c3c2bd', kind: 'area' },
-  { key: 'couch', label: 'Couch', steps: [4], fill: '#a8a7a2', kind: 'area' },
-  { key: 'can', label: 'Trash can', steps: [4], fill: '#8f8e8a', kind: 'area' },
-  { key: 'arrows', label: 'Throw arrows', steps: [4], fill: '#ffffff', kind: 'line' },
-  { key: 'debt', label: 'Debt counter', steps: [4], fill: '#2b2b2a', kind: 'line' },
+  // key, label, steps it appears in, default fill, base = the artwork's original colour (shades scale by fill / base),
+  // kind ('area' = fill + texture, 'line' = fill only)
+  { key: 'paper', label: 'Paper (sheet & ball)', steps: [1, 2, 3, 4], fill: '#ffeda3', base: '#f4f3ef', kind: 'area' },
+  { key: 'floor1', label: 'Floor & grid', steps: [1], fill: '#85858a', base: '#d4d3cf', kind: 'area' },
+  { key: 'wind', label: 'Wind streaks', steps: [1], fill: '#668cff', base: '#668cff', kind: 'line' },
+  { key: 'stage', label: 'Backdrop', steps: [2, 3], fill: '#86858a', base: '#e4e3df', kind: 'area' },
+  { key: 'gloves', label: 'Gloves', steps: [2, 3], fill: '#000000', base: '#e6e5e0', kind: 'area' },
+  { key: 'chevrons', label: 'Drag chevrons', steps: [2], fill: '#949494', base: '#3a3834', kind: 'line' },
+  { key: 'wall', label: 'Wall', steps: [4], fill: '#231f2e', base: '#d6d5d1', kind: 'area' },
+  { key: 'floor', label: 'Floor', steps: [4], fill: '#86858a', base: '#c4c3be', kind: 'area' },
+  { key: 'window', label: 'Window', steps: [4], fill: '#403c53', base: '#c3c2bd', kind: 'area' },
+  { key: 'couch', label: 'Couch', steps: [4], fill: '#3c3a59', base: '#a8a7a2', kind: 'area' },
+  { key: 'can', label: 'Trash can', steps: [4], fill: '#7f3463', base: '#8f8e8a', kind: 'area' },
+  { key: 'arrows', label: 'Throw arrows', steps: [4], fill: '#ffffff', base: '#ffffff', kind: 'line' },
+  { key: 'debt', label: 'Debt counter', steps: [4], fill: '#ff9494', base: '#2b2b2a', kind: 'line' },
 ];
 const TEXTURES = { none: 'None', grain: 'Grain', fiber: 'Paper fiber', lines: 'Lines', dots: 'Dots', crosshatch: 'Crosshatch', weave: 'Canvas weave' };
 const LOOK_DEFAULT_TEX = { texture: 'none', strength: 30, scale: 8 };
@@ -34,7 +35,7 @@ function lookChanged() { LOOK_V++; if (typeof WIND !== 'undefined') WIND.color =
 // ---- colour helpers ----
 const hexRGB = h => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
 const rgbHex = c => '#' + c.map(v => Math.round(clamp(v, 0, 255)).toString(16).padStart(2, '0')).join('');
-function lookRatio(key) { const a = hexRGB(LOOK[key].fill), b = hexRGB(LOOK_BY_KEY[key].fill); return a.map((v, i) => v / Math.max(1, b[i])); }
+function lookRatio(key) { const a = hexRGB(LOOK[key].fill), b = hexRGB(LOOK_BY_KEY[key].base); return a.map((v, i) => v / Math.max(1, b[i])); }
 // a shade of this component, moved by the same ratio as its fill
 const toneCache = new Map();
 function shade(key, hex) {
