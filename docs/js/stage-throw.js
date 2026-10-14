@@ -174,14 +174,22 @@ function drawFurniture() {
   // window
   const wx = W * 0.08, wy = H * 0.125, ww = W * 0.3, wh = H * 0.145;
   ctx.fillStyle = fillOf('window'); ctx.fillRect(wx - 7, wy - 7, ww + 14, wh + 14);
+  textureRect('window', wx - 7, wy - 7, ww + 14, wh + 14);
   const panes = [[0, 0], [1, 0], [0, 1], [1, 1]], pw = (ww - 6) / 2, phh = (wh - 6) / 2;
-  panes.forEach(([i, j], n) => {
-    const x = wx + i * (pw + 6), y = wy + j * (phh + 6);
-    ctx.fillStyle = shade('window', '#eeedea'); ctx.fillRect(x, y, pw, phh);
+  const paneRect = ([i, j]) => [wx + i * (pw + 6), wy + j * (phh + 6), pw, phh];
+  panes.forEach(pn => { ctx.fillStyle = shade('window', '#eeedea'); ctx.fillRect(...paneRect(pn)); });
+  // outside: the Heaven's Waters shader (sky.js), one continuous view seen through all four panes
+  ctx.save(); ctx.beginPath(); panes.forEach(pn => ctx.rect(...paneRect(pn))); ctx.clip();
+  const view = Sky.draw(wx, wy, ww, wh);
+  ctx.restore();
+  panes.forEach(pn => {                                                                   // glass glint
+    const [x, y] = paneRect(pn);
+    ctx.save(); if (view) ctx.globalAlpha = 0.18;
     ctx.fillStyle = shade('window', '#f7f6f3'); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + pw * 0.7, y); ctx.lineTo(x, y + phh * 0.85); ctx.fill();
+    ctx.restore();
   });
   ctx.fillStyle = shade('window', '#b7b6b1'); ctx.fillRect(wx - 12, wy + wh + 6, ww + 24, 6);           // sill
-  textureRect('window', wx - 7, wy - 7, ww + 14, wh + 14); textureRect('window', wx - 12, wy + wh + 6, ww + 24, 6);
+  textureRect('window', wx - 12, wy + wh + 6, ww + 24, 6);
   ctx.fillStyle = `rgba(255,255,255,${0.05 + brighten * 0.6})`;                         // light on the wall
   ctx.beginPath(); ctx.moveTo(wx, wy + wh + 12); ctx.lineTo(wx + ww, wy + wh + 12); ctx.lineTo(wx + ww * 1.5, hz); ctx.lineTo(wx + ww * 0.2, hz); ctx.fill();
   // couch: to the right of the can, against the wall

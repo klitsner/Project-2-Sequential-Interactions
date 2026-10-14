@@ -64,3 +64,8 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .lp-texopts .wp-row { border-top: 0; padding: 3px 0; }
 .lp-note { margin: 2px 0 0 34px; font-size: 9px; color: var(--dim); }
 .look-panel .wp-buttons { margin-top: 4px; }
+.lp-toggle { grid-template-columns: auto 1fr; margin-bottom: 4px; }
+.lp-toggle input { accent-color: #2b2b2a; width: 16px; height: 16px; }
+.lp-skyopts .wp-row { border-top: 0; padding: 3px 0; }
+.lp-skyopts .lp-line { margin: 4px 0; }
+.lp-sky.off .lp-skyopts { opacity: .4; pointer-events: none; }
