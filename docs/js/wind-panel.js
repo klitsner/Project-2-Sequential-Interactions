@@ -2,7 +2,7 @@
 // WIND holds the parameters stage-pickup.js reads every frame. The panel floats on the left, collapses, remembers its
 // values in this browser, and can copy the current values as a prompt.
 const STREAK_LIFE = 1.6;     // seconds each streak lives (from the study)
-const WIND_DEFAULTS = { count: 20, length: 110, width: 1.5, color: '#ffffff', opacity: 85, speed: 530, speedVar: 21, motion: 'linear' };
+const WIND_DEFAULTS = { count: 15, length: 330, width: 2.5, color: '#668cff', opacity: 85, speed: 520, speedVar: 21, motion: 'easeIn' };
 const WIND = { ...WIND_DEFAULTS };
 
 // motion: how a streak covers its path over its life (p: 0 -> 1 of STREAK_LIFE)
@@ -60,7 +60,7 @@ function windRGBA(a) {
       </label>
       <div class="wp-buttons">
         <button type="button" data-act="reset" title="Start the sequence over from the paper on the floor (keeps these values)">Reset state</button>
-        <button type="button" data-act="defaults" title="Put every wind value back to the study’s defaults">Restore defaults</button>
+        <button type="button" data-act="defaults" title="Put every wind value back to the defaults">Restore defaults</button>
         <button type="button" data-act="copy" class="wp-primary" title="Copy these values as a prompt you can paste">Copy as prompt</button>
       </div>
       <p class="wp-status" role="status" aria-live="polite"></p>
