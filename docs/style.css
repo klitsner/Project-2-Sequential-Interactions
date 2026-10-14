@@ -1,0 +1,18 @@
+* { box-sizing: border-box; }
+:root { --bg:#d6d5d1; --fg:#2b2b2a; --dim:#7a7975; color-scheme: light; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); margin: 0; overflow: hidden;
+  font: 12px/1.3 ui-monospace, "SF Mono", Menlo, monospace; }
+/* fills the window at any size; the canvas scales its drawing to fit (core.js) */
+.stage { position: fixed; inset: 0; background: var(--bg);
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.tag { position: absolute; left: 16px; top: 14px; color: var(--dim); letter-spacing: .06em; text-transform: uppercase; font-size: 10px; pointer-events: none; }
+#reset { position: absolute; right: 12px; top: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0;
+  background: transparent; color: var(--dim); font-size: 18px; line-height: 1; cursor: pointer; }
+#reset:focus-visible, #again:focus-visible { outline: 2px solid #aaa; }
+#again { position: absolute; left: 50%; bottom: 8%; transform: translate(-50%, 6px); padding: 10px 18px; border: 0; border-radius: 999px;
+  background: rgba(43,43,42,0.08); color: var(--fg); font: inherit; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer; opacity: 0; transition: opacity 1.2s ease, transform 1.2s ease, background .2s; }
+#again.show { opacity: 1; transform: translate(-50%, 0); }
+#again:hover { background: rgba(43,43,42,0.14); }

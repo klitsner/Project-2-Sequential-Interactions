@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Statement Sequence</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="stage">
+  <canvas id="c"></canvas>
+  <div class="tag" id="tag"></div>
+  <button id="reset" aria-label="Start over" title="Start over">↺</button>
+  <button id="again" hidden>↺ start again</button>
+</div>
+<script>
+const ASSETS = {
+  front_plain: 'assets/statement_front.svg', can: 'assets/can.svg',
+  glove1: 'assets/glove_01.svg', glove2: 'assets/glove_02.svg', glove3: 'assets/glove_03.svg', glove4: 'assets/glove_04.svg', glove5: 'assets/glove_05.svg',
+  roll1: 'assets/ball_roll_01.svg', roll2: 'assets/ball_roll_02.svg', roll3: 'assets/ball_roll_03.svg', roll4: 'assets/ball_roll_04.svg',
+  roll5: 'assets/ball_roll_05.svg', roll6: 'assets/ball_roll_06.svg', roll7: 'assets/ball_roll_07.svg', roll8: 'assets/ball_roll_08.svg',
+};
+</script>
+<script src="js/core.js"></script>
+<script src="js/common.js"></script>
+<script src="js/paper.js"></script>
+<script src="js/stage-pickup.js"></script>
+<script src="js/stage-flip.js"></script>
+<script src="js/stage-crumple.js"></script>
+<script src="js/stage-throw.js"></script>
+<script src="js/sequence.js"></script>
+</body>
+</html>
