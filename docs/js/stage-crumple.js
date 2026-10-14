@@ -80,6 +80,7 @@ const Crumple = (() => {
         ctx.fillStyle = triShade(tt, 0);
         ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.lineTo(cx - 6 * k, cy - 8 * k); ctx.closePath(); ctx.fill(); ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 0.6; ctx.stroke();
       }
+      ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.closePath(); texturePath('paper');
       ctx.restore();
       if (k > 0.6) drawBall(BALL, cx, cy, BALL_R * lerp(1.4, 1, (k - 0.6) / 0.4), 0, (k - 0.6) / 0.4);
     }
@@ -93,8 +94,8 @@ const Crumple = (() => {
     }
     softRipple(S.ripples, t);
   }
-  const BG = '#e4e3df', BG_RGBA = a => `rgba(228,227,223,${a})`;
-  function drawBg() { ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H); }
+  const BG_RGBA = a => { const [r, g, b] = hexRGB(fillOf('stage')); return `rgba(${r},${g},${b},${a})`; };
+  function drawBg() { ctx.fillStyle = fillOf('stage'); ctx.fillRect(0, 0, W, H); textureRect('stage', 0, 0, W, H); }
   function drawShadow(k, a) {
     const c0 = center();
     ctx.fillStyle = `rgba(0,0,0,${0.08 * a})`; ctx.beginPath(); ctx.ellipse(c0.x, c0.y + lerp(HH, BALL_R, k) + 26, lerp(HW, BALL_R, k), 8, 0, 0, Math.PI * 2); ctx.fill();
@@ -103,8 +104,8 @@ const Crumple = (() => {
   // low-poly white glove drawn from 5 frames (glove_01..05.svg): open -> fist. side = 1 for the right hand (fingers point left).
   const GLOVES = [1, 2, 3, 4, 5].map(n => IMG['glove' + n]);
   function glove(x, y, side, curl, alpha) {
-    const im = GLOVES[Math.max(0, Math.min(4, Math.round(curl * 4)))];
-    if (!im.complete) return;
+    const im = lookImage(GLOVES[Math.max(0, Math.min(4, Math.round(curl * 4)))], 'gloves', 2);
+    if (!im) return;
     ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y); ctx.scale(-side * 0.82, 0.82);   // local +x points toward the paper
     ctx.drawImage(im, -96 - 22, -60, 176, 124);    // svg viewBox: -96 -60 176 124; knuckles sit ~28px outside the edge
     ctx.restore();

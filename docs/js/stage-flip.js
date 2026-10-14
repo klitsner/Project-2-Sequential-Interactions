@@ -78,8 +78,7 @@ const Flip = (() => {
     if (S.handA > 0.02 && S.edge) drawGripAndArrow();
     softRipple(S.ripples, t);
   }
-  function drawBg() { ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H); }
-  const BG = '#e4e3df';
+  function drawBg() { ctx.fillStyle = fillOf('stage'); ctx.fillRect(0, 0, W, H); textureRect('stage', 0, 0, W, H); }
 
   // rigid turn around the axis through the centre, parallel to the gripped edge; slight flex in the middle
   function sample(edge, u) {     // u: -0.5..0.5 across the sheet, positive = gripped side
@@ -139,7 +138,7 @@ const Flip = (() => {
     if (show > 0.02) {
       const c = C(), L = (E.axis === 'v' ? PW : PH) * 0.5;
       ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(ang);
-      ctx.strokeStyle = '#3a3834'; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = fillOf('chevrons'); ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       for (let i = 0; i < 2; i++) {
         const f = (now() * 0.9 + i * 0.5) % 1, x = -L / 2 + f * L;
         ctx.globalAlpha = show * Math.sin(f * Math.PI) * 0.85;
@@ -151,7 +150,7 @@ const Flip = (() => {
 
   // simple low-poly white glove, fingers pointing along +x toward the sheet; origin = where the fingertips meet the edge
   const GL = ['#ffffff', '#f3f2ee', '#e6e5e0', '#d6d5d0', '#c4c3be'];
-  function facet(a, b, c, col) { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.lineTo(...c); ctx.closePath(); ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 0.7; ctx.stroke(); }
+  function facet(a, b, c, col) { col = shade('gloves', col); ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.lineTo(...c); ctx.closePath(); ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 0.7; ctx.stroke(); texturePath('gloves'); }
   function quad(a, b, c, d, c1, c2) { facet(a, b, c, c1); facet(a, c, d, c2); }
   function glove(sc, curl) {
     ctx.save(); ctx.scale(sc, sc);
@@ -178,6 +177,6 @@ const Flip = (() => {
   }
   function stop() { if (S.voice) S.voice.off(); S.drag = false; }
   reset();
-  return { reset, frame, down, move, up: endDrag, leave: () => { S.mouse = null; }, stop, drawBg, restPose, BG,
+  return { reset, frame, down, move, up: endDrag, leave: () => { S.mouse = null; }, stop, drawBg, restPose,
            done: () => S.state === 'front', enter: p => { S.mouse = p; } };
 })();

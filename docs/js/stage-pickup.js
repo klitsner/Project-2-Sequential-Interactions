@@ -100,8 +100,8 @@ const Pickup = (() => {
   }
 
   function drawGround() {
-    ctx.fillStyle = '#d4d3cf'; ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = '#c6c5c0'; ctx.lineWidth = 1;
+    ctx.fillStyle = fillOf('floor1'); ctx.fillRect(0, 0, W, H); textureRect('floor1', 0, 0, W, H);
+    ctx.strokeStyle = shade('floor1', '#c6c5c0'); ctx.lineWidth = 1;
     for (let x = (W / 2) % 40; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x + 0.5, 0); ctx.lineTo(x + 0.5, H); ctx.stroke(); }
     for (let y = (H / 2) % 40; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y + 0.5); ctx.lineTo(W, y + 0.5); ctx.stroke(); }
   }
@@ -145,8 +145,7 @@ const Pickup = (() => {
       ctx.save(); ctx.filter = 'blur(2px)'; ctx.fillStyle = 'rgba(0,0,0,0.22)';
       if (!horiz) ctx.fillRect(o.x + 2, o.y + q0 + 3, PW, yf); else ctx.fillRect(o.x + q0 + 2, o.y + 3, yf, PH);
       ctx.restore();
-      ctx.fillStyle = '#f2f1ed';
-      if (!horiz) ctx.fillRect(o.x, o.y + q0, PW, yf); else ctx.fillRect(o.x + q0, o.y, yf, PH);
+      if (BACK) { if (!horiz) ctx.drawImage(BACK, 0, q0 * RES, PW * RES, yf * RES, o.x, o.y + q0, PW, yf); else ctx.drawImage(BACK, q0 * RES, 0, yf * RES, PH * RES, o.x + q0, o.y, yf, PH); }
     }
     // lifted strips, in order so the higher ones land on top
     const sgn = far ? 1 : -1;
@@ -156,10 +155,11 @@ const Pickup = (() => {
       let nAx = -Math.sin(th) * sgn, nz = Math.cos(th);
       const under = th > Math.PI / 2; if (under) { nAx = -nAx; nz = -nz; }
       const lit = horiz ? nAx * LX + nz * LZ : nAx * LY + nz * LZ;
-      if (under && UNDER) {
+      const face = under ? UNDER : BACK;     // the blank side (with its fill + texture) or the statement underneath
+      if (face) {
         const s0 = Math.min(a.src, b.src), sl = Math.max(1, Math.abs(b.src - a.src) * RES);
-        if (!horiz) ctx.drawImage(UNDER, 0, s0 * RES, PW * RES, sl, ...r); else ctx.drawImage(UNDER, s0 * RES, 0, sl, PH * RES, ...r);
-      } else { ctx.fillStyle = '#f2f1ed'; ctx.fillRect(...r); }
+        if (!horiz) ctx.drawImage(face, 0, s0 * RES, PW * RES, sl, ...r); else ctx.drawImage(face, s0 * RES, 0, sl, PH * RES, ...r);
+      }
       const dl = Math.max(0, lit) - LZ;
       ctx.fillStyle = dl < 0 ? `rgba(30,28,25,${-dl * 0.26})` : `rgba(255,255,255,${dl * 0.6})`; ctx.fillRect(...r);
     }

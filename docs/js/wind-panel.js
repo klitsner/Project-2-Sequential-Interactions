@@ -36,7 +36,7 @@ function windRGBA(a) {
     ['speedVar', 'Speed variation', '± %', 0, 100, 1, 'How much each streak’s speed differs from the average'],
   ];
   const panel = document.createElement('aside');
-  panel.className = 'wind-panel';
+  panel.className = 'ctl-panel';
   panel.setAttribute('aria-label', 'Wind controls');
   panel.innerHTML = `
     <button class="wp-head" type="button" aria-expanded="false" aria-controls="wp-body">

@@ -11,13 +11,13 @@ function worldToScreen(x, z, h) { const s = zScale(z); return { x: W / 2 + x * W
 
 let brighten = 0;      // used by the throw study
 function drawRoom() {
-  ctx.fillStyle = COL.wall; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = fillOf('wall'); ctx.fillRect(0, 0, W, H); textureRect('wall', 0, 0, W, HORIZON());
   // floor: two flat facets + board seams in the wall colour
-  ctx.fillStyle = COL.floor;
-  ctx.beginPath(); ctx.moveTo(0, HORIZON()); ctx.lineTo(W, HORIZON()); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill();
+  ctx.fillStyle = fillOf('floor');
+  ctx.beginPath(); ctx.moveTo(0, HORIZON()); ctx.lineTo(W, HORIZON()); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill(); texturePath('floor');
   ctx.fillStyle = 'rgba(0,0,0,0.035)';
   ctx.beginPath(); ctx.moveTo(W / 2, HORIZON()); ctx.lineTo(W, HORIZON()); ctx.lineTo(W, H); ctx.fill();
-  ctx.strokeStyle = COL.wall; ctx.lineWidth = 1.2;
+  ctx.strokeStyle = fillOf('wall'); ctx.lineWidth = 1.2;
   const vx = W / 2, vy = HORIZON() - H * 0.3;
   for (let i = -7; i <= 7; i++) {
     const bx = W / 2 + i * W * 0.2, t = (HORIZON() - vy) / (H - vy);
@@ -30,7 +30,8 @@ const CAN_Z = 1.0, CAN_W = 58, CAN_R = 0.075;
 function canH() { return CAN_W / (H * 0.45 * zScale(CAN_Z)); }       // rim height in world units, matched to the drawing
 function drawCan(dy = 0) {
   const b = worldToScreen(0, CAN_Z, 0), h = CAN_W * 1.24;
-  if (IMG.can.complete) ctx.drawImage(IMG.can, b.x - CAN_W / 2, b.y - h * (120 / 124) + dy, CAN_W, h);
+  const im = lookImage(IMG.can, 'can');
+  if (im) ctx.drawImage(im, b.x - CAN_W / 2, b.y - h * (120 / 124) + dy, CAN_W, h);
   ctx.fillStyle = COL.shadow; ctx.beginPath(); ctx.ellipse(b.x, b.y + 2, CAN_W * 0.42, 4, 0, 0, Math.PI * 2); ctx.fill();
 }
 
@@ -55,7 +56,7 @@ const SHADES = ['#f3f3f0', '#e8e8e4', '#dcdbd6', '#cfcec9', '#c2c1bc', '#b3b2ad'
 function triShade(t, rot) {
   const mx = (t[0][0] + t[1][0] + t[2][0]) / 3, my = (t[0][1] + t[1][1] + t[2][1]) / 3;
   const c = Math.cos(rot), s = Math.sin(rot), x = mx * c - my * s, y = mx * s + my * c;
-  return SHADES[Math.max(0, Math.min(6, Math.round(3 + (x + y) * 2.2 + t.j + SHADE_OFF)))];
+  return shade('paper', SHADES[Math.max(0, Math.min(6, Math.round(3 + (x + y) * 2.2 + t.j + SHADE_OFF)))]);   // follows the paper's fill
 }
 function drawBall(ball, cx, cy, r, rot = 0, alpha = 1) {
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cx, cy); ctx.rotate(rot);
@@ -64,6 +65,7 @@ function drawBall(ball, cx, cy, r, rot = 0, alpha = 1) {
     ctx.beginPath(); ctx.moveTo(t[0][0] * r, t[0][1] * r); ctx.lineTo(t[1][0] * r, t[1][1] * r); ctx.lineTo(t[2][0] * r, t[2][1] * r); ctx.closePath(); ctx.fill();
     ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 0.6; ctx.stroke();   // hide hairline seams
   }
+  ctx.beginPath(); ball.outer.forEach((p, i) => i ? ctx.lineTo(p[0] * r, p[1] * r) : ctx.moveTo(p[0] * r, p[1] * r)); ctx.closePath(); texturePath('paper');
   ctx.restore();
 }
 

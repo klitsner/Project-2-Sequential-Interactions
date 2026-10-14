@@ -9,8 +9,8 @@ const VZK = 0.4, AIMZ = 0.9;
 const ROLL = [1, 2, 3, 4, 5, 6, 7, 8].map(n => IMG['roll' + n]);
 let rollA = 0;   // accumulated roll angle; frame = floor(rollA / 45deg) % 8
 function drawRollBall(cx, cy, r, rot = 0, alpha = 1, dark = 0) {
-  const im = ROLL[((Math.floor(rollA / (Math.PI / 4)) % 8) + 8) % 8];
-  if (!im.complete) return;
+  const im = lookImage(ROLL[((Math.floor(rollA / (Math.PI / 4)) % 8) + 8) % 8], 'paper');   // the same paper: its fill + texture
+  if (!im) return;
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cx, cy); ctx.rotate(rot);
   if (dark > 0) ctx.filter = `brightness(${1 - dark * 0.22})`;
   ctx.drawImage(im, -r * 1.2, -r * 1.2, r * 2.4, r * 2.4);     // svg ball radius is 50 of 120
@@ -146,7 +146,7 @@ function frame(t) {
     for (let i = 0; i < 4; i++) {
       const f = ((t * 1.4 + i / 4) % 1), d = 40 + f * Math.min(260, dist * 0.6), a = Math.sin(f * Math.PI);
       const x = b0.x + Math.cos(ang) * d, y = b0.y + Math.sin(ang) * d;
-      ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.fillStyle = `rgba(255,255,255,${a * 0.9})`;
+      ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.fillStyle = fillOf('arrows'); ctx.globalAlpha = a * 0.9;
       ctx.beginPath(); ctx.moveTo(9, 0); ctx.lineTo(-7, -11); ctx.lineTo(-2, 0); ctx.lineTo(-7, 11); ctx.closePath(); ctx.fill(); ctx.restore();
     }
   }
@@ -173,20 +173,21 @@ function drawFurniture() {
   const hz = HORIZON();
   // window
   const wx = W * 0.08, wy = H * 0.125, ww = W * 0.3, wh = H * 0.145;
-  ctx.fillStyle = '#c3c2bd'; ctx.fillRect(wx - 7, wy - 7, ww + 14, wh + 14);
+  ctx.fillStyle = fillOf('window'); ctx.fillRect(wx - 7, wy - 7, ww + 14, wh + 14);
   const panes = [[0, 0], [1, 0], [0, 1], [1, 1]], pw = (ww - 6) / 2, phh = (wh - 6) / 2;
   panes.forEach(([i, j], n) => {
     const x = wx + i * (pw + 6), y = wy + j * (phh + 6);
-    ctx.fillStyle = '#eeedea'; ctx.fillRect(x, y, pw, phh);
-    ctx.fillStyle = '#f7f6f3'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + pw * 0.7, y); ctx.lineTo(x, y + phh * 0.85); ctx.fill();
+    ctx.fillStyle = shade('window', '#eeedea'); ctx.fillRect(x, y, pw, phh);
+    ctx.fillStyle = shade('window', '#f7f6f3'); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + pw * 0.7, y); ctx.lineTo(x, y + phh * 0.85); ctx.fill();
   });
-  ctx.fillStyle = '#b7b6b1'; ctx.fillRect(wx - 12, wy + wh + 6, ww + 24, 6);           // sill
+  ctx.fillStyle = shade('window', '#b7b6b1'); ctx.fillRect(wx - 12, wy + wh + 6, ww + 24, 6);           // sill
+  textureRect('window', wx - 7, wy - 7, ww + 14, wh + 14); textureRect('window', wx - 12, wy + wh + 6, ww + 24, 6);
   ctx.fillStyle = `rgba(255,255,255,${0.05 + brighten * 0.6})`;                         // light on the wall
   ctx.beginPath(); ctx.moveTo(wx, wy + wh + 12); ctx.lineTo(wx + ww, wy + wh + 12); ctx.lineTo(wx + ww * 1.5, hz); ctx.lineTo(wx + ww * 0.2, hz); ctx.fill();
   // couch: to the right of the can, against the wall
   const z = 1.12, P = (x, h) => worldToScreen(x, z, h);
   const x0 = 0.3, x1 = 1.55;
-  const quad = (a, b, c, d, col) => { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.closePath(); ctx.fill(); };
+  const quad = (a, b, c, d, col) => { ctx.fillStyle = shade('couch', col); ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.closePath(); ctx.fill(); texturePath('couch'); };
   ctx.fillStyle = 'rgba(0,0,0,0.08)'; const f0 = P(x0, 0), f1 = P(x1, 0); ctx.beginPath(); ctx.ellipse((f0.x + f1.x) / 2, f0.y + 2, (f1.x - f0.x) / 2 + 6, 5, 0, 0, Math.PI * 2); ctx.fill();
   quad(P(x0 + 0.06, 0.35), P(x1 - 0.06, 0.35), P(x1 - 0.06, 0.78), P(x0 + 0.06, 0.78), '#a8a7a2');    // back
   quad(P(x0 + 0.06, 0.78), P(x1 - 0.06, 0.78), P(x1 - 0.1, 0.84), P(x0 + 0.1, 0.84), '#b9b8b3');       // back top
@@ -214,13 +215,13 @@ function addInterest(t) {
 }
 function drawDebt(t) {
   ctx.save(); ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(43,43,42,0.55)'; ctx.font = '600 10px Helvetica, Arial, sans-serif';
-  ctx.fillText('TOTAL DEBT', W / 2, DEBT_Y - 34);
+  ctx.fillStyle = fillOf('debt'); ctx.globalAlpha *= 0.55; ctx.font = '600 10px Helvetica, Arial, sans-serif';
+  ctx.fillText('TOTAL DEBT', W / 2, DEBT_Y - 34); ctx.globalAlpha /= 0.55;
   const sx = (Math.random() - 0.5) * 8 * S.debtShake;
   if (S.phase === null || S.phase === 'zero') {
     ctx.font = '700 34px Helvetica, Arial, sans-serif';
-    if (S.phase === 'zero') { ctx.globalAlpha = S.zeroA; ctx.fillStyle = '#2b2b2a'; ctx.fillText('$0.00', W / 2, DEBT_Y); }
-    else { ctx.fillStyle = S.debtShake > 0.2 ? '#000' : '#2b2b2a'; ctx.fillText(money(S.shown), W / 2 + sx, DEBT_Y); }
+    if (S.phase === 'zero') { ctx.globalAlpha = S.zeroA; ctx.fillStyle = fillOf('debt'); ctx.fillText('$0.00', W / 2, DEBT_Y); }
+    else { ctx.fillStyle = S.debtShake > 0.2 ? shade('debt', '#000000') : fillOf('debt'); ctx.fillText(money(S.shown), W / 2 + sx, DEBT_Y); }
   }
   ctx.restore();
   // floating "+$..." from where the ball landed, drifting up to the counter
@@ -228,7 +229,7 @@ function drawDebt(t) {
     const age = t - f.t, k = easeIO(age / 1.4);
     if (age > 1.6) continue;
     ctx.save(); ctx.globalAlpha = age < 1.2 ? 1 : 1 - (age - 1.2) / 0.4;
-    ctx.fillStyle = '#2b2b2a'; ctx.font = '700 15px Helvetica, Arial, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = fillOf('debt'); ctx.font = '700 15px Helvetica, Arial, sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(f.text, lerp(f.x, W / 2 + 70, k), lerp(f.y, DEBT_Y - 30, k));
     ctx.restore();
   }
@@ -237,7 +238,7 @@ function drawDebt(t) {
   for (const d of S.digits) {
     if (d.a <= 0.01) continue;
     ctx.save(); ctx.globalAlpha = d.a; ctx.translate(d.x, d.y); ctx.rotate(d.r); ctx.scale(d.s, d.s);
-    ctx.fillStyle = '#2b2b2a'; ctx.font = '700 34px Helvetica, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = fillOf('debt'); ctx.font = '700 34px Helvetica, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
     ctx.fillText(d.ch, 0, 0); ctx.restore();
   }
 }

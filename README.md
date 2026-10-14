@@ -12,4 +12,5 @@ HTML/JS (no build step). To publish it, set GitHub Pages to deploy from the `mai
 - `docs/js/paper.js` — the one sheet's faces, reused by every step
 - `docs/js/stage-*.js` — each study, adapted as a step
 - `docs/js/sequence.js` — runs the steps in order, the hand-off transitions, reset and the ending
+- `docs/js/look.js`, `look-panel.js` — every visual component's fill + texture, and the panel (left) that edits them
 - `docs/js/wind-panel.js` — the collapsible panel (left) for tuning the step 1 wind streaks; defaults live in `WIND_DEFAULTS`

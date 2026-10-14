@@ -83,8 +83,7 @@ const TRANSITIONS = [
     ctx.save(); ctx.globalAlpha = 1 - k; Pickup.drawGround(); ctx.restore();
     const sh = lerpShadow(A.shadow, B.shadow, k); rectShadow(sh.x, sh.y, sh.w, sh.h, sh.a, sh.blur);
     const cx = lerp(A.cx, B.cx, k), cy = lerp(A.cy, B.cy, k), w = lerp(A.w, B.w, k), h = lerp(A.h, B.h, k);
-    ctx.fillStyle = '#f2f1ed'; ctx.fillRect(cx - w / 2, cy - h / 2, w, h);      // the pick-up study's paper tone...
-    drawSheetAt(BACK, cx, cy, w, h, k);                                          // ...into the flip study's back face
+    drawSheetAt(BACK, cx, cy, w, h);                                             // the blank side, still up
   },
   // 2 -> 3: the turned sheet, statement up, eases to the crumple size while its creases (facets) fade in
   (e, t) => {
