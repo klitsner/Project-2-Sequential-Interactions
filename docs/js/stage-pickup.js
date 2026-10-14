@@ -11,7 +11,7 @@ const Pickup = (() => {
     if (S && S.wind) S.wind.off();
     if (S && S.peel) S.peel.off();
     S = { state: 'floor', edge: 'bottom', d: 0, R: 20, u: 0, mouse: null, grabY: 0, dGrab: 0, d0: 0,
-          gustStart: now() + 0.4, windFrom: 'bottom', gust: 0, streaks: [], ripples: [], wind: S && S.wind, peel: S && S.peel };
+          gustStart: now() + 0.4, windFrom: 'bottom', gust: 0, spawn: 0, streaks: [], ripples: [], wind: S && S.wind, peel: S && S.peel };
     lastT = now();
   }
   const origin = () => ({ x: W / 2 - PW / 2, y: H * 0.5 - PH / 2 });
@@ -43,10 +43,14 @@ const Pickup = (() => {
     const ga = t - S.gustStart;      // rise 0.3s, hold 0.5s, fall 0.3s, rest
     S.gust = ga < 0 ? 0 : ga < 0.3 ? easeIO(ga / 0.3) : ga < 0.8 ? 1 : ga < 1.1 ? 1 - easeIO((ga - 0.8) / 0.3) : 0;
     if (S.wind) S.wind.set(250 + S.gust * 600, 0.012 + S.gust * 0.06, 0.6);
-    if (S.gust > 0.15 && Math.random() < 0.35) {
+    // streaks: WIND (wind-panel.js) sets how many per gust, their length, speed and spread; gust > 0.15 lasts ~0.95 s
+    if (S.gust > 0.15) S.spawn += WIND.count / 0.95 * fdt; else S.spawn = 0;
+    while (S.spawn >= 1) {
+      S.spawn -= 1;
       const o = origin(), dir = { left: [1, 0], right: [-1, 0], top: [0, 1], bottom: [0, -1] }[S.windFrom];
       const across = dir[0] ? o.y + Math.random() * PH : o.x + Math.random() * PW;
-      S.streaks.push({ dir, across, along: 0, len: 60 + Math.random() * 100, v: 420 + Math.random() * 220, bend: (Math.random() - 0.5) * 24, t });
+      S.streaks.push({ dir, across, along: 0, len: WIND.length * (1 + (Math.random() - 0.5) * 0.9),
+                       v: WIND.speed * (1 + (Math.random() * 2 - 1) * WIND.speedVar / 100), bend: (Math.random() - 0.5) * 24, t });
     }
 
     const hov = S.state === 'floor' && overPaper(S.mouse);
@@ -77,15 +81,17 @@ const Pickup = (() => {
 
     // ---- draw ----
     drawGround();
-    S.streaks = S.streaks.filter(s => t - s.t < 1.6);
+    S.streaks = S.streaks.filter(s => t - s.t < STREAK_LIFE);
     for (const s of S.streaks) {
-      s.along += s.v * dt; const a = Math.min(1, (t - s.t) * 3) * (1 - (t - s.t) / 1.6) * 0.85;
+      const age = t - s.t;
+      s.along = s.v * STREAK_LIFE * windEase(age / STREAK_LIFE);                // eased travel over the streak's life
+      const a = Math.min(1, age * 3) * (1 - age / STREAK_LIFE) * WIND.opacity / 100;
       const [dx, dy] = s.dir, sg = dx || dy;
       const start = sg > 0 ? -60 : (dx ? W : H) + 60;
       const head = start + sg * s.along, tail = head - sg * s.len;
       const P = v => dx ? [v, s.across] : [s.across, v];
-      const g = ctx.createLinearGradient(...P(tail), ...P(head)); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, `rgba(255,255,255,${a})`);
-      ctx.strokeStyle = g; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+      const g = ctx.createLinearGradient(...P(tail), ...P(head)); g.addColorStop(0, windRGBA(0)); g.addColorStop(1, windRGBA(a));
+      ctx.strokeStyle = g; ctx.lineWidth = WIND.width; ctx.lineCap = 'round';
       const m = P((head + tail) / 2), bend = dx ? [0, s.bend] : [s.bend, 0];
       ctx.beginPath(); ctx.moveTo(...P(tail)); ctx.quadraticCurveTo(m[0] + bend[0], m[1] + bend[1], ...P(head)); ctx.stroke();
     }
