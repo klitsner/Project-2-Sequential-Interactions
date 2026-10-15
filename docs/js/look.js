@@ -7,7 +7,7 @@ const LOOK_COMPONENTS = [
   // kind ('area' = fill + texture, 'line' = fill only)
   { key: 'paper', label: 'Paper (sheet & ball)', steps: [1, 2, 3, 4], fill: '#ffeda3', base: '#f4f3ef', kind: 'area' },
   { key: 'floor1', label: 'Floor & grid', steps: [1], fill: '#85858a', base: '#d4d3cf', kind: 'area' },
-  { key: 'wind', label: 'Wind streaks', steps: [1], fill: '#668cff', base: '#668cff', kind: 'line' },
+  { key: 'wind', label: 'Wind streaks', steps: [1], fill: '#b3c6ff', base: '#b3c6ff', kind: 'line' },
   { key: 'stage', label: 'Backdrop', steps: [2, 3], fill: '#86858a', base: '#e4e3df', kind: 'area' },
   { key: 'gloves', label: 'Gloves', steps: [2, 3], fill: '#000000', base: '#e6e5e0', kind: 'area' },
   { key: 'chevrons', label: 'Drag chevrons', steps: [2], fill: '#949494', base: '#3a3834', kind: 'line' },
