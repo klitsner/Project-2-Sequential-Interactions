@@ -228,7 +228,9 @@ function drawDebt(t) {
   const sx = (Math.random() - 0.5) * 8 * S.debtShake;
   if (S.phase === null || S.phase === 'zero') {
     ctx.font = '700 34px Helvetica, Arial, sans-serif';
-    if (S.phase === 'zero') { ctx.globalAlpha = S.zeroA; ctx.fillStyle = fillOf('debt'); ctx.fillText('$0.00', W / 2, DEBT_Y); }
+    if (S.phase === 'zero') {      // cleared: the letters show the same view as the window (sky.js), else the debt colour
+      if (!Sky.fillText('$0.00', W / 2, DEBT_Y, ctx.font, ctx.globalAlpha * S.zeroA)) { ctx.globalAlpha = S.zeroA; ctx.fillStyle = fillOf('debt'); ctx.fillText('$0.00', W / 2, DEBT_Y); }
+    }
     else { ctx.fillStyle = S.debtShake > 0.2 ? shade('debt', '#000000') : fillOf('debt'); ctx.fillText(money(S.shown), W / 2 + sx, DEBT_Y); }
   }
   ctx.restore();

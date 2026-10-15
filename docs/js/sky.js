@@ -105,5 +105,23 @@ void main() { vec4 c; mainImage(c, gl_FragCoord.xy); outColor = vec4(c.rgb * uTi
     ctx.restore();
     return true;
   }
-  return { draw, ready };
+  // fill text with the current view (used for the cleared $0.00): returns false if the view isn't available
+  let textCv = null;
+  function fillText(text, x, y, font, alpha) {
+    if (!ready() || !Sky.c) return false;
+    const k = SC * DPR;                                   // draw at device resolution so the letters stay crisp
+    ctx.save(); ctx.font = font; const m = ctx.measureText(text); ctx.restore();
+    const tw = m.width, asc = m.actualBoundingBoxAscent || 30, desc = m.actualBoundingBoxDescent || 4, pad = 4;
+    const w = tw + pad * 2, h = asc + desc + pad * 2;
+    textCv = textCv || document.createElement('canvas');
+    textCv.width = Math.ceil(w * k); textCv.height = Math.ceil(h * k);
+    const g = textCv.getContext('2d'); g.setTransform(k, 0, 0, k, 0, 0);
+    g.font = font; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = '#fff';
+    g.fillText(text, pad, pad + asc);
+    g.globalCompositeOperation = 'source-in';           // keep the view only inside the letters
+    const c = crop(w, h); g.drawImage(canvas, c.sx, c.sy, c.sw, c.sh, 0, 0, w, h);
+    ctx.save(); ctx.globalAlpha = alpha; ctx.drawImage(textCv, x - tw / 2 - pad, y - asc - pad, w, h); ctx.restore();
+    return true;
+  }
+  return { draw, ready, fillText };
 })();
