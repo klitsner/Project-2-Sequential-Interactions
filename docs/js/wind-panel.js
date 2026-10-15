@@ -1,7 +1,7 @@
 // ---- wind panel: live controls for the draft's streaks in step 1 (pick up) ----
 // WIND holds the parameters stage-pickup.js reads every frame. The panel floats on the left, collapses, remembers its
 // values in this browser, and can copy the current values as a prompt.
-const SHOW_WIND_PANEL = false;   // panel hidden for now: set to true to bring it back (saved tweaks are ignored while hidden)
+const SHOW_WIND_PANEL = true;    // set to false to hide the panel (saved tweaks are then ignored)
 const STREAK_LIFE = 1.6;     // seconds each streak lives (from the study)
 const WIND_DEFAULTS = { count: 15, length: 330, width: 2.5, color: '#668cff', opacity: 85, speed: 520, speedVar: 21, motion: 'easeIn' };
 const WIND = { ...WIND_DEFAULTS };
@@ -67,7 +67,7 @@ function windRGBA(a) {
       </div>
       <p class="wp-status" role="status" aria-live="polite"></p>
     </div>`;
-  document.querySelector('.stage').appendChild(panel);
+  controlDock().appendChild(panel);
 
   const fmt = (k, v) => k === 'color' ? v : k === 'width' ? (+v).toFixed(1) : String(Math.round(v));
   function sync() {
@@ -77,7 +77,8 @@ function windRGBA(a) {
   panel.addEventListener('input', e => {
     const k = e.target.dataset.k; if (!k) return;
     WIND[k] = k === 'color' || k === 'motion' ? e.target.value : +e.target.value;
-    sync(); save();
+    if (k === 'color') { LOOK.wind.fill = WIND.color; lookChanged(); }   // one wind colour, shared with the visuals panel
+    sync(); save(); panelsSync();
   });
   const status = panel.querySelector('.wp-status');
   const say = msg => { status.textContent = msg; clearTimeout(say.t); say.t = setTimeout(() => { status.textContent = ''; }, 2200); };
@@ -105,14 +106,16 @@ function windRGBA(a) {
     if (head) { const open = !panel.classList.contains('open'); panel.classList.toggle('open', open); head.setAttribute('aria-expanded', open); save(); return; }
     const act = e.target.dataset && e.target.dataset.act;
     if (act === 'reset') { resetAll(); say('Sequence reset to the start.'); }
-    else if (act === 'defaults') { Object.assign(WIND, WIND_DEFAULTS); sync(); save(); say('Defaults restored.'); }
+    else if (act === 'defaults') { Object.assign(WIND, WIND_DEFAULTS); LOOK.wind.fill = WIND.color; lookChanged(); sync(); save(); panelsSync(); say('Defaults restored.'); }
     else if (act === 'copy') say(await copy(prompt()) ? 'Prompt copied to clipboard.' : 'Copy failed — select and copy manually.');
   });
   // keep clicks and drags on the panel from reaching the canvas interactions
   ['pointerdown', 'pointerup'].forEach(ev => panel.addEventListener(ev, e => e.stopPropagation()));
 
   const saved = load();
-  if (saved && saved.params) for (const k in WIND_DEFAULTS) if (k in saved.params) WIND[k] = saved.params[k];
+  if (saved && saved.params) for (const k in WIND_DEFAULTS) if (k in saved.params && k !== 'color') WIND[k] = saved.params[k];
+  WIND.color = LOOK.wind.fill;                       // the colour's saved value lives with the visuals panel
+  window.addEventListener('ctl-sync', () => { WIND.color = LOOK.wind.fill; sync(); });
   if (!(WIND.motion in WIND_MOTIONS)) WIND.motion = WIND_DEFAULTS.motion;
   const startOpen = saved ? !!saved.open : window.innerWidth >= 700;
   panel.classList.toggle('open', startOpen); panel.querySelector('.wp-head').setAttribute('aria-expanded', startOpen);

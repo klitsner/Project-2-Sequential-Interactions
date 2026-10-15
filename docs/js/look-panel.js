@@ -1,6 +1,8 @@
 // ---- look panel: lists every visual component, grouped by the step it appears in, with fill + texture controls ----
 // Floats on the left and collapses; values are remembered in this browser. The group for the current step is marked.
+const SHOW_LOOK_PANEL = false;   // panel hidden for now: set to true to bring it back (saved tweaks are ignored while hidden)
 (() => {
+  if (!SHOW_LOOK_PANEL) return;
   const STORE = 'statement-look-v1';
   const GROUPS = [
     { title: 'All steps', keys: ['paper'], steps: [1, 2, 3, 4] },
@@ -68,7 +70,7 @@
       </div>
       <p class="wp-status" role="status" aria-live="polite"></p>
     </div>`;
-  document.querySelector('.stage').appendChild(panel);
+  controlDock().appendChild(panel);
 
   function sync() {
     panel.querySelectorAll('[data-c][data-p]').forEach(el => {
@@ -90,7 +92,7 @@
     }
     const { c, p } = e.target.dataset; if (!c || !p || e.target.tagName === 'OUTPUT') return;
     LOOK[c][p] = p === 'strength' || p === 'scale' ? +e.target.value : e.target.value;
-    lookChanged(); sync(); save();
+    lookChanged(); sync(); save(); if (c === 'wind') panelsSync();
   });
   const status = panel.querySelector('.wp-status');
   const say = msg => { status.textContent = msg; clearTimeout(say.t); say.t = setTimeout(() => { status.textContent = ''; }, 2200); };
@@ -124,7 +126,7 @@
     const head = e.target.closest('.wp-head');
     if (head) { const open = !panel.classList.contains('open'); panel.classList.toggle('open', open); head.setAttribute('aria-expanded', open); save(); return; }
     const act = e.target.dataset && e.target.dataset.act;
-    if (act === 'defaults') { Object.assign(LOOK, lookDefaults()); Object.assign(SKY, SKY_DEFAULTS); lookChanged(); sync(); save(); say('Defaults restored.'); }
+    if (act === 'defaults') { Object.assign(LOOK, lookDefaults()); Object.assign(SKY, SKY_DEFAULTS); lookChanged(); sync(); save(); panelsSync(); say('Defaults restored.'); }
     else if (act === 'reset') { resetAll(); say('Sequence reset to the start.'); }
     else if (act === 'copy') say(await copy(prompt()) ? 'Prompt copied to clipboard.' : 'Copy failed — select and copy manually.');
   });
@@ -137,6 +139,7 @@
     panel.querySelectorAll('.lp-group').forEach(el => el.classList.toggle('now', el.dataset.g === 'sky' ? SEQ.i === 3 : GROUPS[+el.dataset.g].steps.includes(SEQ.i + 1)));
   }, 250);
 
+  window.addEventListener('ctl-sync', () => sync());
   const saved = load();
   if (saved && saved.look) for (const k in LOOK) if (saved.look[k]) {
     const s = saved.look[k], L = LOOK[k];

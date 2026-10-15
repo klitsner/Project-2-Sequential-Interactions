@@ -31,6 +31,14 @@ function lookDefaults() {
 Object.assign(LOOK, lookDefaults());
 const LOOK_BY_KEY = Object.fromEntries(LOOK_COMPONENTS.map(c => [c.key, c]));
 function lookChanged() { LOOK_V++; if (typeof WIND !== 'undefined') WIND.color = LOOK.wind.fill; }
+// panels refresh their inputs on this event (the wind colour lives in both the wind and visuals panels)
+const panelsSync = () => window.dispatchEvent(new Event('ctl-sync'));
+// the left-hand column the control panels stack in
+function controlDock() {
+  let d = document.querySelector('.ctl-dock');
+  if (!d) { d = document.createElement('div'); d.className = 'ctl-dock'; document.querySelector('.stage').appendChild(d); }
+  return d;
+}
 
 // ---- colour helpers ----
 const hexRGB = h => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
