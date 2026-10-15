@@ -1,7 +1,7 @@
 // ---- wind panel: live controls for the draft's streaks in step 1 (pick up) ----
 // WIND holds the parameters stage-pickup.js reads every frame. The panel floats on the left, collapses, remembers its
 // values in this browser, and can copy the current values as a prompt.
-const SHOW_WIND_PANEL = true;    // set to false to hide the panel (saved tweaks are then ignored)
+const SHOW_WIND_PANEL = false;   // panel hidden for now: set to true to bring it back (saved tweaks are ignored while hidden)
 const STREAK_LIFE = 1.6;     // seconds each streak lives (from the study)
 const WIND_DEFAULTS = { count: 37, length: 340, width: 4.5, color: '#b3c6ff', opacity: 100, speed: 220, speedVar: 83, motion: 'easeIn' };
 const WIND = { ...WIND_DEFAULTS };
