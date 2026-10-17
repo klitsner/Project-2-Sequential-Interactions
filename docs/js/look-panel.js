@@ -1,6 +1,6 @@
 // ---- look panel: lists every visual component, grouped by the step it appears in, with fill + texture controls ----
 // Floats on the left and collapses; values are remembered in this browser. The group for the current step is marked.
-const SHOW_LOOK_PANEL = false;   // panel hidden for now: set to true to bring it back (saved tweaks are ignored while hidden)
+const SHOW_LOOK_PANEL = true;    // set to false to hide the panel (saved tweaks are then ignored)
 (() => {
   if (!SHOW_LOOK_PANEL) return;
   const STORE = 'statement-look-v1';
