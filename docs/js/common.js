@@ -30,7 +30,7 @@ const CAN_Z = 1.0, CAN_W = 58, CAN_R = 0.075;
 function canH() { return CAN_W / (H * 0.45 * zScale(CAN_Z)); }       // rim height in world units, matched to the drawing
 function drawCan(dy = 0) {
   const b = worldToScreen(0, CAN_Z, 0), h = CAN_W * 1.24;
-  const im = lookImage(IMG.can, 'can');
+  const im = canImage();          // can.js: panels with a wrapped texture, rim in its own colour
   if (im) ctx.drawImage(im, b.x - CAN_W / 2, b.y - h * (120 / 124) + dy, CAN_W, h);
   ctx.fillStyle = COL.shadow; ctx.beginPath(); ctx.ellipse(b.x, b.y + 2, CAN_W * 0.42, 4, 0, 0, Math.PI * 2); ctx.fill();
 }

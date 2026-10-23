@@ -16,6 +16,7 @@ const LOOK_COMPONENTS = [
   { key: 'window', label: 'Window', steps: [4], fill: '#403c53', base: '#c3c2bd', kind: 'area' },
   { key: 'couch', label: 'Couch', steps: [4], fill: '#3c3a59', base: '#a8a7a2', kind: 'area' },
   { key: 'can', label: 'Trash can', steps: [4], fill: '#7f3463', base: '#8f8e8a', kind: 'area' },
+  { key: 'canRim', label: 'Trash can rim', steps: [4], fill: '#7f3463', base: '#8f8e8a', kind: 'line' },
   { key: 'arrows', label: 'Throw arrows', steps: [4], fill: '#ffffff', base: '#ffffff', kind: 'line' },
   { key: 'debt', label: 'Debt counter', steps: [4], fill: '#ff9494', base: '#2b2b2a', kind: 'line' },
 ];

@@ -9,7 +9,7 @@ const SHOW_LOOK_PANEL = true;    // set to false to hide the panel (saved tweaks
     { title: '1 · Pick up', keys: ['floor1', 'wind'], steps: [1] },
     { title: '2–3 · Flip & crumple', keys: ['stage', 'gloves'], steps: [2, 3] },
     { title: '2 · Flip', keys: ['chevrons'], steps: [2] },
-    { title: '4 · Throw', keys: ['wall', 'floor', 'window', 'couch', 'can', 'arrows', 'debt'], steps: [4] },
+    { title: '4 · Throw', keys: ['wall', 'floor', 'window', 'couch', 'can', 'canRim', 'arrows', 'debt'], steps: [4] },
   ];
   const load = () => { try { return JSON.parse(localStorage.getItem(STORE)) || null; } catch (e) { return null; } };
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify({ look: LOOK, sky: SKY, open: panel.classList.contains('open') })); } catch (e) {} };
@@ -36,7 +36,7 @@ const SHOW_LOOK_PANEL = true;    // set to false to hide the panel (saved tweaks
           <input type="range" min="2" max="40" step="1" data-c="${c.key}" data-p="scale">
           <span class="wp-range"><small>2</small><small>40 px</small></span>
         </label>
-      </div>` : `<p class="lp-note">Line / text — colour only</p>`}
+      </div>` : `<p class="lp-note">Colour only</p>`}
     </div>`;
   const fmtSky = (k, v) => k === 'tint' ? v : (+v).toFixed(SKY_PARAMS.find(p => p[0] === k)[5] < 0.01 ? 3 : SKY_PARAMS.find(p => p[0] === k)[5] < 1 ? 2 : 0);
   const skySection = () => `
